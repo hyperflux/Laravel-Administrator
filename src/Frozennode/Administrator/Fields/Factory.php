@@ -383,7 +383,7 @@ class Factory {
 	 */
 	public function getEditFields($loadRelationships = true, $override = false)
 	{
-		if (!sizeof($this->editFields) || $override)
+        if (is_array($this->editFields) && !sizeof($this->editFields) || !is_array($this->editFields) || $override)
 		{
 			$this->editFields = array();
 
@@ -484,23 +484,23 @@ class Factory {
 	 * @return array
 	 */
 	public function getFilters()
-	{
-		//get the model's filter fields
-		$configFilters = $this->config->getOption('filters');
+    {
+        //get the model's filter fields
+        $configFilters = $this->config->getOption('filters');
 
-		//make sure that the filters array hasn't been created before and that there are supplied filters in the config
-		if (!sizeof($this->filters) && $configFilters)
-		{
-			//iterate over the filters and create field objects for them
-			foreach ($configFilters as $name => $filter)
-			{
-				if ($fieldObject = $this->make($name, $filter))
-				{
-					//the filters array is indexed on the field name and holds the arrayed values for the filters
-					$this->filters[$fieldObject->getOption('field_name')] = $fieldObject;
-				}
-			}
-		}
+        //make sure that the filters array hasn't been created before and that there are supplied filters in the config
+        if ($configFilters) {
+            if (is_array($this->filters) && !sizeof($this->filters) || !is_array($this->filters))
+            {
+                //iterate over the filters and create field objects for them
+                foreach ($configFilters as $name => $filter) {
+                    if ($fieldObject = $this->make($name, $filter)) {
+                        //the filters array is indexed on the field name and holds the arrayed values for the filters
+                        $this->filters[$fieldObject->getOption('field_name')] = $fieldObject;
+                    }
+                }
+            }
+        }
 
 		return $this->filters;
 	}
@@ -512,7 +512,7 @@ class Factory {
 	 */
 	public function getFiltersArrays()
 	{
-		if (!sizeof($this->filtersArrays))
+        if (is_array($this->filtersArrays) && !sizeof($this->filtersArrays) || !is_array($this->filtersArrays))
 		{
 			foreach ($this->getFilters() as $name => $filter)
 			{
@@ -596,7 +596,7 @@ class Factory {
 		//if this is an autocomplete field, check if there is a search term. If not, just return the selected items
 		if ($fieldObject->getOption('autocomplete') && !$term)
 		{
-			if (sizeof($selectedItems))
+            if (is_array($selectedItems) && !sizeof($selectedItems) || !is_array($selectedItems))
 			{
 				$this->filterQueryBySelectedItems($query, $selectedItems, $fieldObject, $relatedKeyTable);
 
@@ -713,28 +713,31 @@ class Factory {
 	{
 		$configConstraints = $fieldObject->getOption('constraints');
 
-		if (sizeof($configConstraints))
+        if (is_array($configConstraints) && !sizeof($configConstraints) || !is_array($configConstraints))
 		{
 			//iterate over the config constraints
 			foreach ($configConstraints as $key => $relationshipName)
 			{
 				//now that we're looping through the constraints, check to see if this one was supplied
-				if (isset($constraints[$key]) && $constraints[$key] && sizeof($constraints[$key]))
+				if (isset($constraints[$key]) && $constraints[$key])
 				{
-					//first we get the other model and the relationship field on it
-					$model = $this->config->getDataModel();
-					$relatedModel = $model->{$fieldObject->getOption('field_name')}()->getRelated();
-					$otherModel = $model->{$key}()->getRelated();
+                    if (is_array($constraints[$key]) && !sizeof($constraints[$key]) || !is_array($constraints[$key])) {
 
-					//set the data model for the config
-					$this->config->setDataModel($otherModel);
-					$otherField = $this->make($relationshipName, array('type' => 'relationship'), false);
+                        //first we get the other model and the relationship field on it
+                        $model = $this->config->getDataModel();
+                        $relatedModel = $model->{$fieldObject->getOption('field_name')}()->getRelated();
+                        $otherModel = $model->{$key}()->getRelated();
 
-					//constrain the query
-					$otherField->constrainQuery($query, $relatedModel, $constraints[$key]);
+                        //set the data model for the config
+                        $this->config->setDataModel($otherModel);
+                        $otherField = $this->make($relationshipName, array('type' => 'relationship'), false);
 
-					//set the data model back to the original
-					$this->config->setDataModel($model);
+                        //constrain the query
+                        $otherField->constrainQuery($query, $relatedModel, $constraints[$key]);
+
+                        //set the data model back to the original
+                        $this->config->setDataModel($model);
+                    }
 				}
 			}
 		}

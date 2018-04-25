@@ -174,7 +174,7 @@ class Factory {
 	public function getActions($override = false)
 	{
 		//make sure we only run this once and then return the cached version
-		if (!sizeof($this->actions) || $override)
+        if (is_array($this->actions) && !sizeof($this->actions) || !is_array($this->actions) || $override)
 		{
 			$this->actions = array();
 
@@ -198,7 +198,7 @@ class Factory {
 	public function getActionsOptions($override = false)
 	{
 		//make sure we only run this once and then return the cached version
-		if (!sizeof($this->actionsOptions) || $override)
+        if (is_array($this->actionsOptions) && !sizeof($this->actionsOptions) || !is_array($this->actionsOptions) || $override)
 		{
 			$this->actionsOptions = array();
 
@@ -222,7 +222,7 @@ class Factory {
 	public function getGlobalActions($override = false)
 	{
 		//make sure we only run this once and then return the cached version
-		if (!sizeof($this->globalActions) || $override)
+        if (is_array($this->globalActions) && !sizeof($this->globalActions) || !is_array($this->globalActions) || $override)
 		{
 			$this->globalActions = array();
 
@@ -246,7 +246,7 @@ class Factory {
 	public function getGlobalActionsOptions($override = false)
 	{
 		//make sure we only run this once and then return the cached version
-		if (!sizeof($this->globalActionsOptions) || $override)
+        if (is_array($this->globalActionsOptions) && !sizeof($this->globalActionsOptions) || !is_array($this->globalActionsOptions) || $override)
 		{
 			$this->globalActionsOptions = array();
 
@@ -270,7 +270,7 @@ class Factory {
 	public function getActionPermissions($override = false)
 	{
 		//make sure we only run this once and then return the cached version
-		if (!sizeof($this->actionPermissions) || $override)
+        if (is_array($this->actionPermissions) && !sizeof($this->actionPermissions) || !is_array($this->actionPermissions) || $override)
 		{
 			$this->actionPermissions = array();
 			$model = $this->config->getDataModel();
